@@ -1,0 +1,20 @@
+{
+  "welcome": {
+    "enabled": true,
+    "channelId": "",
+    "message": "Welcome {user} to the server!",
+    "embed": true,
+    "color": "#5865F2"
+  },
+  "giveaway": {
+    "managerRole": "",
+    "color": "#FEE75C",
+    "storage": "./giveaways.json"
+  },
+  "modmail": {
+    "guildId": "",
+    "categoryId": "",
+    "logChannelId": "",
+    "staffRoleId": ""
+  }
+}
