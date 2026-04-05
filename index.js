@@ -124,7 +124,6 @@ const commands = [
     new SlashCommandBuilder().setName('setlink').setDescription('Link gamepass').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild).addIntegerOption(opt => opt.setName('price').setDescription('Price to link').setRequired(true)).addStringOption(opt => opt.setName('url').setDescription('Gamepass URL').setRequired(true)),
     new SlashCommandBuilder().setName('tax').setDescription('Calculate tax').addIntegerOption(opt => opt.setName('amount').setDescription('Amount to receive').setRequired(true)),
     new SlashCommandBuilder().setName('order_log').setDescription('Log sale').setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages).addUserOption(opt => opt.setName('user').setDescription('The buyer').setRequired(true)).addStringOption(opt => opt.setName('item').setDescription('Item purchased').setRequired(true)),
-    new SlashCommandBuilder().setName('credit').setDescription('Credits'),
     new SlashCommandBuilder().setName('license').setDescription('License info'),
     new SlashCommandBuilder().setName('giveaway').setDescription('Giveaway management').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .addSubcommand(sub => sub.setName('start').setDescription('Start giveaway').addStringOption(opt => opt.setName('duration').setDescription('Duration (e.g. 1h)').setRequired(true)).addIntegerOption(opt => opt.setName('winners').setDescription('Number of winners').setRequired(true)).addStringOption(opt => opt.setName('prize').setDescription('Prize').setRequired(true)))
@@ -399,8 +398,7 @@ client.on('interactionCreate', async interaction => {
     if (commandName === 'license') {
         if (!remote_data) return interaction.reply({ content: 'No data.', ephemeral: true });
         const e1 = new EmbedBuilder().setTitle(cleanBranding(remote_data.license.title)).setDescription(cleanBranding(remote_data.license.text)).setColor(0x2B2D31);
-        const e2 = new EmbedBuilder().setTitle(cleanBranding(remote_data.license.ad.title)).setDescription(cleanBranding(remote_data.license.ad.description)).setColor(0x5865F2).addFields({ name: 'Links', value: remote_data.license.ad.links });
-        await interaction.reply({ embeds: [e1, e2] });
+        await interaction.reply({ embeds: [e1] });
     }
 
     if (commandName === 'payment') {
@@ -410,10 +408,6 @@ client.on('interactionCreate', async interaction => {
     }
     if (commandName === 'setlink') { gamepassLinks.set(options.getInteger('price'), options.getString('url')); await interaction.reply({ content: 'Set!', ephemeral: true }); }
     if (commandName === 'tax') { const amt = options.getInteger('amount'); await interaction.reply({ embeds: [new EmbedBuilder().setTitle('Tax').addFields({ name: 'Pay', value: `${Math.ceil(amt/0.7)} R$` }).setColor(0xFFA500)] }); }
-    if (commandName === 'credit') {
-        const e = new EmbedBuilder().setTitle('💎 Credits').addFields({ name: 'Dev', value: '`@ts_122`' }, { name: 'Support', value: '[Cortex](https://discord.gg/gkBfyk45ec)' }).setColor(0x5865F2);
-        await interaction.reply({ embeds: [e] });
-    }
 });
 
 client.on('error', console.error);

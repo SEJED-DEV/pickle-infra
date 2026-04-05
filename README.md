@@ -71,7 +71,7 @@ node index.js
 It is highly recommended to use **PM2** for production:
 ```bash
 npm install pm2 -g
-pm2 start index.js --name "pickle-bot"
+pm2 start index.js --name "pickle-infra"
 pm2 save
 ```
 
