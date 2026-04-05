@@ -157,16 +157,25 @@ client.once('ready', async () => {
     console.log(`[Debug] Has DirectMessages Intent: ${intents.has(GatewayIntentBits.DirectMessages)}`);
     
     const guildId = config.modmail.guildId;
-    console.log(`[Debug] Looking for Guild ID: ${guildId}`);
-    const guild = await client.guilds.fetch(guildId).catch(() => null);
-    
-    if (guild) {
-        console.log(`[ModMail] SUCCESS: Connected to Guild: ${guild.name}`);
-        const category = await guild.channels.fetch(config.modmail.categoryId).catch(() => null);
-        if (category) console.log(`[ModMail] SUCCESS: Found Ticket Category: ${category.name}`);
-        else console.log(`[ModMail] ERROR: Category ID ${config.modmail.categoryId} not found in this guild!`);
+    if (guildId && typeof guildId === 'string' && guildId.trim() !== '') {
+        console.log(`[Debug] Looking for Guild ID: ${guildId}`);
+        const guild = await client.guilds.fetch(guildId).catch(() => null);
+        
+        if (guild && guild.name) {
+            console.log(`[ModMail] SUCCESS: Connected to Guild: ${guild.name}`);
+            const categoryId = config.modmail.categoryId;
+            if (categoryId && typeof categoryId === 'string' && categoryId.trim() !== '') {
+                const category = await guild.channels.fetch(categoryId).catch(() => null);
+                if (category) console.log(`[ModMail] SUCCESS: Found Ticket Category: ${category.name}`);
+                else console.log(`[ModMail] ERROR: Category ID ${categoryId} not found in this guild!`);
+            } else {
+                console.log(`[ModMail] SKIP: No Category ID configured yet.`);
+            }
+        } else {
+            console.log(`[ModMail] ERROR: Bot cannot find Guild ID [${guildId}]. Ensure the bot is in that server.`);
+        }
     } else {
-        console.log(`[ModMail] ERROR: Bot cannot find Guild ID ${guildId}.`);
+        console.log(`[ModMail] SKIP: No Guild ID configured yet. Use /setup modmail to initialize.`);
     }
 
     try {
@@ -206,13 +215,17 @@ async function processModmail(author, content, attachments, msgId) {
 
     let ticket = tickets.find(t => t.userId === author.id && !t.closed);
     const guildId = config.modmail.guildId;
+    if (!guildId || guildId.trim() === '') return console.log('[ModMail] Aborting: No Guild ID configured.');
+
     const guild = await client.guilds.fetch(guildId).catch(() => null);
-    if (!guild) return console.error('[ModMail] Guild not found.');
+    if (!guild || !guild.channels) return console.error('[ModMail] Guild or Channel Manager not found.');
 
     if (!ticket) {
         const categoryId = config.modmail.categoryId;
+        if (!categoryId || categoryId.trim() === '') return console.log('[ModMail] Aborting: No Category ID configured.');
+
         const category = await guild.channels.fetch(categoryId).catch(() => null);
-        if (!category) return;
+        if (!category) return console.log('[ModMail] Aborting: Category not found.');
 
         try {
             const ticketChannel = await guild.channels.create({
